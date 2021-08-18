@@ -47,8 +47,6 @@ if (NODE_ENV === "development") {
 //ProductRoutes crud
 
 /**MIDDLEWARES */
-// app.use(notFound);
-// app.use(errorHandler);
 app.use(cors());
 
 //SETTING THE PORT
