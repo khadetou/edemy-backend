@@ -1,12 +1,12 @@
 import fs from "fs";
 import express from "express";
-// import connectDB from './config/db.js';
+import connectDB from "./config/db.js";
 import dotenv from "dotenv";
 import colors from "colors";
 import cors from "cors";
 
+//Morgan
 const morgan = require("morgan");
-// import {notFound, errorHandler} from './middleware/errorMiddleware.js';
 
 //INITIALISING DOTENV AND EXPRESS
 dotenv.config();
@@ -14,7 +14,7 @@ const app = express();
 const { PORT, NODE_ENV } = process.env;
 
 //connection to the database.
-// connectDB();
+connectDB();
 
 //CRUD Routing generated authomatically
 fs.readdirSync("./routes").map((route) =>
