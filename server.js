@@ -4,7 +4,7 @@ import connectDB from "./config/db.js";
 import dotenv from "dotenv";
 import colors from "colors";
 import cors from "cors";
-
+import { notFound, errorHandler } from "./middleware/error";
 //Morgan
 const morgan = require("morgan");
 
@@ -25,14 +25,18 @@ connectDB();
 app.use(express.json({ extended: false }));
 
 //CRUD Routing generated authomatically
-fs.readdirSync("./routes").map((route) =>
-  app.use("/api", require(`./routes/${route}`))
-);
+fs.readdirSync("./routes").map((route) => {
+  app.use("/api", require(`./routes/${route}`));
+});
 
 //Show us the actions that we hit
 if (NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
+
+//Middleware error handler
+app.use(notFound);
+app.use(errorHandler);
 
 //SETTING THE PORT
 const PORTV = PORT || 8000;

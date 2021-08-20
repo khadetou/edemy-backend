@@ -4,7 +4,7 @@ import jsonwebtoken from "jsonwebtoken";
 import bcryptjs from "bcryptjs";
 
 export const register = asyncHandler(async (req, res) => {
-  const { name, email, password, isAdmin } = req.body;
+  const { name, email, password } = req.body;
   let user = await User.findOne({ email });
 
   if (user) {
@@ -15,7 +15,6 @@ export const register = asyncHandler(async (req, res) => {
     name,
     email,
     password,
-    isAdmin,
   });
 
   //Encrypt Password
