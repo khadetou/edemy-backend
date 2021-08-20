@@ -13,6 +13,10 @@ dotenv.config();
 const app = express();
 const { PORT, NODE_ENV } = process.env;
 
+/**MIDDLEWARES */
+app.use(cors());
+app.options("*", cors());
+
 //connection to the database.
 connectDB();
 
@@ -21,20 +25,6 @@ connectDB();
 app.use(express.json({ extended: false }));
 
 //CRUD Routing generated authomatically
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
-  if (req.method == "OPTIONS") {
-    res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
-    return res.status(200).json({});
-  }
-
-  next();
-});
-
 fs.readdirSync("./routes").map((route) =>
   app.use("/api", require(`./routes/${route}`))
 );
@@ -43,11 +33,6 @@ fs.readdirSync("./routes").map((route) =>
 if (NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
-
-//ProductRoutes crud
-
-/**MIDDLEWARES */
-app.use(cors());
 
 //SETTING THE PORT
 const PORTV = PORT || 8000;
