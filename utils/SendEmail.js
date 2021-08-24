@@ -21,15 +21,15 @@ export default async function sendEMail(options) {
   } = process.env;
 
   let transport = nodemailer.createTransport({
-    host: "smtp.mailtrap.io",
-    port: 2525,
+    host: SMTP_HOST,
+    port: SMTP_PORT,
     auth: {
-      user: "b35967b3b5d728",
-      pass: "47ea213e6c6a59",
+      user: SMTP_USER,
+      pass: SMTP_PASS,
     },
   });
   const message = {
-    from: '"EDEMY" <noreply@gmail.com>',
+    from: `${SMTP_FROM_NAME}<${SMTP_FROM_EMAIL}>`,
     to: options.email,
     subject: options.subject,
     text: "Reset Password",
