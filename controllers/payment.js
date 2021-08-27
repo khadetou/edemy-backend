@@ -28,11 +28,37 @@ export const registerAsIntructor = asyncHandler(async (req, res) => {
     type: "account_onboarding",
   });
 
-  console.log(accountLink);
   // 4. pre-fill any info such as email (optional), then send url resposne to frontend
+  // same as : accountLink = {...accountLink, "stripe_user[email]": user.email}
   accountLink = Object.assign(accountLink, {
     "stripe_user[email]": user.email,
   });
   // 5. then send the account link as response to fronend
   res.send(`${accountLink.url}?${queryString.stringify(accountLink)}`);
+});
+
+export const stripeStatus = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user.id).exec();
+  if (!user) {
+    res.status(404).json({ message: "User was not found" });
+  }
+
+  const account = await stripe.accounts.retrieve(user.stripe_account_id);
+
+  if (!account.charges_enabled) {
+    return res.status(401).send("UnAuthorized");
+  } else {
+    const statusUpdated = await User.findByIdAndUpdate(
+      user.id,
+      {
+        stripe_seller: account,
+        $addToSet: { role: "Instructor" },
+      },
+      { new: true }
+    )
+      .select("-password")
+      .exec();
+
+    res.json(statusUpdated);
+  }
 });
