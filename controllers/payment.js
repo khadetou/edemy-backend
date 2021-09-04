@@ -5,6 +5,7 @@ import queryString from "query-string";
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 //I used connect here stripe connect
+//Register as an instructor
 export const registerAsIntructor = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user.id).exec();
   if (!user) {
@@ -37,6 +38,7 @@ export const registerAsIntructor = asyncHandler(async (req, res) => {
   res.send(`${accountLink.url}?${queryString.stringify(accountLink)}`);
 });
 
+//Get stripe status
 export const stripeStatus = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user.id).exec();
   if (!user) {
@@ -60,5 +62,18 @@ export const stripeStatus = asyncHandler(async (req, res) => {
       .exec();
 
     res.json(statusUpdated);
+  }
+});
+
+//@desc Get intructor
+//@route get/api/course/current-instructor
+export const getCurrentInstructor = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user.id).select("-password");
+  if (!user.role.includes("Instructor")) {
+    res
+      .status(403)
+      .json({ message: "You are not an Instructor, apply to become one !" });
+  } else {
+    res.json(user);
   }
 });
