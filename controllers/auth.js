@@ -4,6 +4,14 @@ import jsonwebtoken from "jsonwebtoken";
 import bcryptjs from "bcryptjs";
 import sendEMail from "../utils/SendEmail";
 import crypto from "crypto";
+import cloudinary from "cloudinary";
+
+//Setting up cloudinary config
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_KEY,
+  api_secret: process.env.CLOUDINARY_SECRET,
+});
 
 export const register = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const courseSchema = mongoose.Schema(
+const lessonSchema = new mongoose.Schema(
   {
     title: {
       type: String,
@@ -23,9 +23,65 @@ const courseSchema = mongoose.Schema(
       default: false,
     },
   },
+  { timestamps: true }
+);
+
+const courseSchema = mongoose.Schema(
   {
-    timestamps: true,
-  }
+    name: {
+      type: String,
+      trim: true,
+      minlength: 3,
+      maxlength: 320,
+      required: true,
+    },
+    slug: {
+      type: String,
+      lowercase: true,
+    },
+    description: {
+      type: String,
+      minlength: 200,
+      required: true,
+    },
+    price: {
+      type: Number,
+      default: 9.99,
+    },
+    image: [
+      {
+        public_id: {
+          type: String,
+          required: true,
+        },
+
+        url: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
+    category: String,
+    published: {
+      type: Boolean,
+      default: false,
+    },
+    paid: {
+      type: Boolean,
+      default: true,
+    },
+    category: {
+      type: String,
+      required: true,
+    },
+    instructor: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    lessons: [lessonSchema],
+  },
+  { timestamps: true }
 );
 
 const Course = mongoose.model("Course", courseSchema);

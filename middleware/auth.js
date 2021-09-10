@@ -21,13 +21,13 @@ export default (req, res, next) => {
   }
 };
 
-export const isAdmin = asyncHandler(async (req, res, next) => {
+export const isInstructor = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id).select("-password");
 
-  if (user && user.isAdmin) {
+  if (user && user.role.includes("Instructor")) {
     next();
   } else {
     res.status(401);
-    throw new Error("Not authorized as an Admin");
+    throw new Error("Not authorized only Instructors");
   }
 });
