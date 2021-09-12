@@ -7,7 +7,7 @@ const lessonSchema = new mongoose.Schema(
       trim: true,
       minlength: 3,
       maxlength: 320,
-      required: true,
+      required: [true, "Title is required!"],
     },
     slug: {
       type: String,

@@ -159,6 +159,21 @@ export const uploadVideo = asyncHandler(async (req, res) => {
   res.json(videoLinks);
 });
 
+//@Desc Delete video
+//@route  Post/api/course/lesson/delete-video
+//@Access private isInstructor
+export const deleteVideo = asyncHandler(async (req, res) => {
+  const { public_id } = req.body;
+
+  if (public_id) {
+    await cloudinary.v2.uploader.destroy(public_id);
+    res.json({ message: "Video has been removed successfully" });
+  } else {
+    res.status(404);
+    throw Error("Video not found");
+  }
+});
+
 //@Desc Create lesson
 //@Desc post/api/course/lesson/:id
 //@Access private instructor
@@ -177,9 +192,7 @@ export const createLesson = asyncHandler(async (req, res) => {
   }
 
   const { title, video, content, slug } = req.body;
-
-  console.log(video);
-
+  console.log(video, title, content);
   const lesson = {};
   lesson.instructor = req.user.id;
 

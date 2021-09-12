@@ -9,12 +9,15 @@ import {
   updateCourse,
   createLesson,
   uploadVideo,
+  deleteVideo,
 } from "../controllers/course";
 
 const router = express.Router();
 
 router.get("/course", Auth, isInstructor, getAllCourses);
-router.post("/course", Auth, isInstructor, createCourse);
+router
+  .post("/course", Auth, isInstructor, createCourse)
+  .post("/course/lesson/delete-video", Auth, isInstructor, deleteVideo);
 
 router
   .get("/course/:id", Auth, isInstructor, getCourseById)
