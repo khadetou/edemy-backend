@@ -17,10 +17,25 @@ const lessonSchema = new mongoose.Schema(
       type: {},
       minlength: 200,
     },
-    video_link: {},
+    video_link: {
+      public_id: {
+        type: String,
+        required: true,
+      },
+
+      url: {
+        type: String,
+        required: true,
+      },
+    },
     free_preview: {
       type: Boolean,
       default: false,
+    },
+    instructor: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
   },
   { timestamps: true }

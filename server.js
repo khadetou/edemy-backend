@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import colors from "colors";
 import cors from "cors";
 import { notFound, errorHandler } from "./middleware/error";
+
 //Morgan
 const morgan = require("morgan");
 
@@ -22,7 +23,7 @@ connectDB();
 
 //Allow us to take data from the body for the authentification
 //Should be placed before our requests
-app.use(express.json({ extended: false }));
+app.use(express.json({ limit: "500mb" }));
 
 //CRUD Routing generated authomatically
 fs.readdirSync("./routes").map((route) => {

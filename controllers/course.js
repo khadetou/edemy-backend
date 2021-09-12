@@ -8,7 +8,6 @@ import cloudinary from "cloudinary";
 export const createCourse = asyncHandler(async (req, res) => {
   const { name, description, slug, price, published, image, paid, category } =
     req.body;
-  console.log(category);
 
   const courseField = {};
 
@@ -125,3 +124,120 @@ export const deleteCourse = asyncHandler(async (req, res) => {
     throw new Error("Course not found");
   }
 });
+
+//@Desc Upload Video
+//@Desc post/api/course/lesson/uplaod-video/:id
+//@Access private instructor
+
+export const uploadVideo = asyncHandler(async (req, res) => {
+  if (req.user.id != req.params.id) {
+    res.status(400);
+    throw Error("Unauthorized");
+  }
+
+  let videoLinks = {};
+  const {
+    video: { path },
+  } = req.files;
+
+  if (path) {
+    const result = await cloudinary.v2.uploader.upload(
+      path,
+      {
+        resource_type: "video",
+        type: "upload",
+        use_filename: true,
+        folder: "edemy/course/videos",
+      },
+      function (error, result) {
+        console.log(error);
+      }
+    );
+    videoLinks.public_id = result.public_id;
+    videoLinks.url = result.secure_url;
+  }
+  res.json(videoLinks);
+});
+
+//@Desc Create lesson
+//@Desc post/api/course/lesson/:id
+//@Access private instructor
+
+export const createLesson = asyncHandler(async (req, res) => {
+  const course = await Course.findById(req.params.id);
+
+  if (!course) {
+    res.status(404);
+    throw Error("Course not found");
+  }
+
+  if (req.user.id.toString() !== course.instructor.toString()) {
+    res.status(400);
+    throw Error("Unauthorized");
+  }
+
+  const { title, video, content, slug } = req.body;
+
+  console.log(video);
+
+  const lesson = {};
+  lesson.instructor = req.user.id;
+
+  if (title) lesson.title = title;
+  if (video) lesson.video_link = video;
+  if (content) lesson.content = content;
+  if (slug) lesson.slug = slug;
+
+  course.lessons.push(lesson);
+  const updated = await course.save();
+  res.json(updated);
+});
+
+// const storage = multer.diskStorage({
+//   filename(req, file, cb) {
+//     cb(
+//       null,
+//       `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`
+//     );
+//   },
+// });
+
+// const fileFilter = (req, file, cb) => {
+//   if (file.mimetype === "video/mp4") {
+//     cb(null, true);
+//   } else {
+//     cb(
+//       {
+//         message: "Unsupported file format",
+//       },
+//       false
+//     );
+//   }
+// };
+
+// const upload = multer({
+//   storage,
+//   limits: {
+//     fieldNameSize: 200,
+//     fileSize: 30 * 1024 * 1024,
+//   },
+//   fileFilter,
+// }).single("video");
+
+// upload(req, res, (err) => {
+//   if (err) return res.send(err);
+// });
+// const { path: pa } = req.file;
+
+// import { IncomingForm } from "formidable";
+
+// const data = await new Promise((resolve, reject) => {
+//   const form = new IncomingForm();
+
+//   form.parse(req, (err, fields, file) => {
+//     if (err) return reject(err);
+//     resolve({ fields, file });
+//   });
+// });
+
+// const file = data.file.video.path;
