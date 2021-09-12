@@ -15,14 +15,14 @@ import {
 const router = express.Router();
 
 router.get("/course", Auth, isInstructor, getAllCourses);
-router
-  .post("/course", Auth, isInstructor, createCourse)
-  .post("/course/lesson/delete-video", Auth, isInstructor, deleteVideo);
+router.post("/course", Auth, isInstructor, createCourse);
 
 router
   .get("/course/:id", Auth, isInstructor, getCourseById)
   .post("/course/lesson/:id", Auth, isInstructor, createLesson)
+  .post("/course/lesson/delete-video/:id", Auth, isInstructor, deleteVideo)
   .post("/course/lesson/upload-video/:id", Auth, formidable(), uploadVideo)
+
   .put("/course/:id", Auth, isInstructor, updateCourse)
   .delete("/course/:id", Auth, isInstructor, deleteCourse);
 module.exports = router;

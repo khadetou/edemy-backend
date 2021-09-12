@@ -116,7 +116,9 @@ export const deleteCourse = asyncHandler(async (req, res) => {
   const course = await Course.findById(req.params.id);
 
   if (course) {
-    await cloudinary.v2.uploader.destroy(course.image[0].public_id);
+    await cloudinary.v2.uploader.destroy(course.image[0].public_id, {
+      folder: "edemy/course",
+    });
     await course.remove();
     res.json({ message: "Course removed successfully", success: true });
   } else {
@@ -141,18 +143,12 @@ export const uploadVideo = asyncHandler(async (req, res) => {
   } = req.files;
 
   if (path) {
-    const result = await cloudinary.v2.uploader.upload(
-      path,
-      {
-        resource_type: "video",
-        type: "upload",
-        use_filename: true,
-        folder: "edemy/course/videos",
-      },
-      function (error, result) {
-        console.log(error);
-      }
-    );
+    const result = await cloudinary.v2.uploader.upload(path, {
+      resource_type: "video",
+      type: "upload",
+      use_filename: true,
+      folder: "edemy/course/videos",
+    });
     videoLinks.public_id = result.public_id;
     videoLinks.url = result.secure_url;
   }
@@ -160,14 +156,26 @@ export const uploadVideo = asyncHandler(async (req, res) => {
 });
 
 //@Desc Delete video
-//@route  Post/api/course/lesson/delete-video
+//@route  Post/api/course/lesson/delete-video/:id
 //@Access private isInstructor
 export const deleteVideo = asyncHandler(async (req, res) => {
+  if (req.user.id != req.params.id) {
+    res.status(400);
+    throw Error("Unauthorized");
+  }
   const { public_id } = req.body;
 
   if (public_id) {
-    await cloudinary.v2.uploader.destroy(public_id);
-    res.json({ message: "Video has been removed successfully" });
+    const { result } = await cloudinary.v2.uploader.destroy(public_id, {
+      resource_type: "video",
+      folder: "edemy/course/videos",
+    });
+    if (result === "ok") {
+      res.json({ message: "Video has been removed successfully" });
+    } else {
+      res.status(404);
+      throw Error(result);
+    }
   } else {
     res.status(404);
     throw Error("Video not found");
@@ -192,7 +200,7 @@ export const createLesson = asyncHandler(async (req, res) => {
   }
 
   const { title, video, content, slug } = req.body;
-  console.log(video, title, content);
+
   const lesson = {};
   lesson.instructor = req.user.id;
 
