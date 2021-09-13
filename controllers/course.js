@@ -214,14 +214,14 @@ export const createLesson = asyncHandler(async (req, res) => {
   res.json(updated);
 });
 
-//@desc Get a single lesson
+//@desc Remove a lesson
 //@route Put/api/courses/lesson/:id/:lessonId
 //@access private, Instructor
 export const deleteLesson = asyncHandler(async (req, res) => {
   const { id, lessonId } = req.params;
-  console.log(id, lessonId);
+
   const course = await Course.findById(id);
-  console.log(id);
+
   if (req.user.id != course.instructor) {
     res.status(400);
     throw Error("Unauthorized");
@@ -231,6 +231,58 @@ export const deleteLesson = asyncHandler(async (req, res) => {
   }).exec();
 
   res.json({ message: "Lesson deleted successfully" });
+});
+
+//@desc update a lesson
+//@route Put/api/courses/lesson/:id
+//@access private, Instructor
+export const updateLesson = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { _id, title, content, video, free_preview } = req.body;
+  const course = await Course.findById(id);
+  if (course.instructor != req.user.id) {
+    res.status(400);
+    throw Error("Unauthorized");
+  }
+
+  const updateLesson = await Course.updateOne(
+    { "lessons._id": _id },
+    {
+      $set: {
+        "lessons.$.title": title,
+        "lessons.$.content": content,
+        "lessons.$.video": video,
+        "lessons.$.free_preview": free_preview,
+      },
+    },
+    { new: true }
+  ).exec();
+  res.json(updateLesson);
+});
+
+//@Desc publish the course
+//@route Put/api/course/publish/:id
+//@Access Private isInstructor
+export const publishCourse = asyncHandler(async (req, res) => {
+  if (req.user.id != req.params.id) {
+    res.status(400);
+    throw Error("Unauthorized");
+  }
+  const course = await Course.findById(req.params.id);
+
+  if (!course) {
+    res.status(404);
+    throw Error("Course not found");
+  } else {
+    const publish = await Course.findByIdAndUpdate(
+      req.params.id,
+      { published: true },
+      {
+        new: true,
+      }
+    ).exec();
+    res.json(publish);
+  }
 });
 
 // const storage = multer.diskStorage({
