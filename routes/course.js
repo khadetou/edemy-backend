@@ -10,6 +10,7 @@ import {
   createLesson,
   uploadVideo,
   deleteVideo,
+  deleteLesson,
 } from "../controllers/course";
 
 const router = express.Router();
@@ -24,5 +25,6 @@ router
   .post("/course/lesson/upload-video/:id", Auth, formidable(), uploadVideo)
 
   .put("/course/:id", Auth, isInstructor, updateCourse)
-  .delete("/course/:id", Auth, isInstructor, deleteCourse);
+  .delete("/course/:id", Auth, isInstructor, deleteCourse)
+  .put("/course/lesson/:id/:lessonId", Auth, isInstructor, deleteLesson);
 module.exports = router;

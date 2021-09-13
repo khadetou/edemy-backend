@@ -214,6 +214,25 @@ export const createLesson = asyncHandler(async (req, res) => {
   res.json(updated);
 });
 
+//@desc Get a single lesson
+//@route Put/api/courses/lesson/:id/:lessonId
+//@access private, Instructor
+export const deleteLesson = asyncHandler(async (req, res) => {
+  const { id, lessonId } = req.params;
+  console.log(id, lessonId);
+  const course = await Course.findById(id);
+  console.log(id);
+  if (req.user.id != course.instructor) {
+    res.status(400);
+    throw Error("Unauthorized");
+  }
+  await Course.findByIdAndUpdate(course._id, {
+    $pull: { lessons: { _id: lessonId } },
+  }).exec();
+
+  res.json({ message: "Lesson deleted successfully" });
+});
+
 // const storage = multer.diskStorage({
 //   filename(req, file, cb) {
 //     cb(
